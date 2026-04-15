@@ -13,8 +13,23 @@ cp -r lx-music-skill ~/.openclaw/workspace/skills/lx-music
 
 ## 前置条件
 
-- LX Music 桌面版 v2.7.0+
-- 开启「开放 API 服务」（设置 → 开放 API → 启用）
+### 1. 安装 LX Music 桌面版
+
+下载并安装 [落雪音乐 LX-Music Desktop](https://github.com/lyswhut/lx-music-desktop)：
+
+- Windows: 下载 `.exe` 或 `.msi` 安装包
+- macOS: 下载 `.dmg` 安装包
+- Linux: 下载 `.AppImage` 或 `.deb` 包
+
+### 2. 开启开放 API
+
+1. 打开 LX Music 软件
+2. 进入 **设置** → **开放 API**
+3. 勾选 **启用开放 API 服务**
+4. 记下端口号（默认 `23330`）
+
+### 3. 其他依赖
+
 - Python 3（用于歌单查询脚本）
 
 ## 快速使用
