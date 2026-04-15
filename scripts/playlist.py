@@ -1,6 +1,24 @@
-import sqlite3, sys, json
+import sqlite3, sys, json, os, subprocess
 
-LX_DATA = r"%APPDATA%/lx-music-desktop/LxDatas/lx.data.db"
+if sys.stdout.encoding != "utf-8":
+    import io
+
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+
+
+def get_lx_data_path():
+    if sys.platform == "win32":
+        base = os.environ.get("APPDATA", os.path.expanduser("~/AppData/Roaming"))
+    elif sys.platform == "darwin":
+        base = os.path.expanduser("~/Library/Application Support")
+    else:
+        base = os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
+        if not os.path.exists(os.path.join(base, "lx-music-desktop")):
+            base = os.path.expanduser("~/.config")
+    return os.path.join(base, "lx-music-desktop", "LxDatas", "lx.data.db")
+
+
+LX_DATA = get_lx_data_path()
 
 
 def get_playlists():
@@ -36,8 +54,6 @@ if __name__ == "__main__":
     elif sys.argv[1] == "songs" and len(sys.argv) >= 3:
         print(json.dumps(get_playlist_songs(sys.argv[2]), ensure_ascii=False, indent=2))
     elif sys.argv[1] == "play" and len(sys.argv) >= 3:
-        import subprocess
-
         list_id = sys.argv[2]
         conn = sqlite3.connect(LX_DATA)
         conn.text_factory = str
@@ -47,39 +63,10 @@ if __name__ == "__main__":
         conn.close()
         if row:
             source, sid = row
-            if source == "wy":
-                subprocess.run(
-                    [
-                        "powershell",
-                        "-Command",
-                        f'Start-Process "lxmusic://songlist/play/wy/{sid}"',
-                    ]
-                )
-            elif source == "tx":
-                subprocess.run(
-                    [
-                        "powershell",
-                        "-Command",
-                        f'Start-Process "lxmusic://songlist/play/tx/{sid}"',
-                    ]
-                )
-            elif source == "kg":
-                subprocess.run(
-                    [
-                        "powershell",
-                        "-Command",
-                        f'Start-Process "lxmusic://songlist/play/kg/{sid}"',
-                    ]
-                )
-            elif source == "mg":
-                subprocess.run(
-                    [
-                        "powershell",
-                        "-Command",
-                        f'Start-Process "lxmusic://songlist/play/mg/{sid}"',
-                    ]
-                )
+            url = f"lxmusic://songlist/play/{source}/{sid}" if sid else None
+            if url:
+                subprocess.run(["powershell", "-Command", f"Start-Process '{url}'"])
             else:
-                print("Unsupported source:", source)
+                print("No sourceId for this playlist")
         else:
             print("Playlist not found:", list_id)
