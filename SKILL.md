@@ -11,6 +11,7 @@ description: |
   - "LX Music 收藏当前歌曲"、"收藏这首歌"
   - "播放一首歌"、"放一首周杰伦的歌"、"搜索并播放"
   - "跳到30秒"、"快进到1分钟"
+  - "播放歌单"、"打开歌单"、"播放我的收藏歌单"
 allowed-tools: Bash(curl *), PowerShell(Start-Process *)
 ---
 
@@ -99,11 +100,31 @@ powershell -Command "Start-Process 'lxmusic://music/searchPlay/晴天-周杰伦'
 powershell -Command "Start-Process 'lxmusic://music/search/kw/周杰伦'"
 ```
 
-URL 方式传参格式（不需要 JSON）：
+### 歌单操作（Scheme URL）
+
+歌单需要歌单 ID，不同源的 ID 获取方式不同（通常在歌曲详情页 URL 中可见）。
+
+```powershell
+# 打开歌单（仅打开，不播放）
+powershell -Command "Start-Process 'lxmusic://songlist/open/kw/歌单ID'"
+
+# 播放歌单
+powershell -Command "Start-Process 'lxmusic://songlist/play/kw/歌单ID'"
+
+# 播放歌单并指定播放第几首（从 0 开始）
+powershell -Command "Start-Process 'lxmusic://songlist/play/kw/歌单ID?index=0'"
 ```
-lxmusic://music/searchPlay/{歌曲名-歌手}
-lxmusic://music/search/{source}/{关键词}   # source: kw/kg/tx/wy/mg
+
+URL 方式传参格式：
 ```
+lxmusic://songlist/open/{source}/{id}
+lxmusic://songlist/play/{source}/{id}
+lxmusic://songlist/play/{source}/{id}?index=N
+```
+
+**source 取值**：`kw`（酷狗）| `kg`（酷我）| `tx`（QQ）| `wy`（网易）| `mg`（咪咕）
+
+> 注意：歌单 ID 需要从 LX Music 界面中获取（例如在歌单页面 URL 或分享链接中）。不同源的 ID 不可混用。
 
 Scheme URL 不需要 API 服务开启也可使用。
 
